@@ -1,0 +1,21 @@
+{% extends "detector/base.html" %}
+{% block title %} New User Registration {% endblock %}
+{% block content %}
+<div class="mx-auto dt-auth-main">
+    <div class="card dt-auth-signup">
+        <header>New User Registration</header>
+        <section>
+            <form method="POST" action="{{ url_for('auth.signup', next=request.args.get('next')) }}" class="form-signin">
+                {{ form.csrf_token }}
+                {% for msg in get_flashed_messages() %}
+                    <div class="dt-auth-flash">{{ msg }}</div>
+                {% endfor %}
+            {{ form.username(size=30, class="form-control dt-auth-input", placeholder="Username") }}
+            {{ form.email(class="form-control dt-auth-input", placeholder="Email Address") }}
+            {{ form.password(class="form-control dt-auth-input", placeholder="Password") }}
+            {{ form.submit(class="btn btn-md btn-primary btn-block dt-auth-btn") }}
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}
