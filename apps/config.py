@@ -123,6 +123,9 @@ class TestingConfig(BaseConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
 
+    # 이미지 업로드처에 tests/detector/images 를 지정한다.
+    UPLOAD_FOLDER = str(Path(basedir, "tests", "detector", "imgs"))
+
 
 config_mode = {
     "testing": TestingConfig,
@@ -185,7 +188,7 @@ def app_blueprint_builder(app):
 
 # error handler
 def page_not_found(e):
-    return render_template("404.html"), 404
+        return render_template("404.html"), 404
 
 def internal_server_error(e):
     return render_template("500.html"), 500

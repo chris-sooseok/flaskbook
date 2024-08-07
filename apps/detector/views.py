@@ -178,7 +178,6 @@ def search():
     user_images = db.session.query(User, UserImage).join(UserImage, User.id == UserImage.user_id)
 
     # GET 파라미터로부터 검색 단어를 가져온다
-    print("-------------" + request.endpoint + "---------------")
     search_text = request.args.get("search")
     user_image_tag_dict = {}
     filtered_user_images = []
@@ -274,6 +273,9 @@ def delete_image(image_id):
 
     return redirect(url_for('detector.index'))
 
+@dt.errorhandler(404)
+def page_not_found(e):
+    return render_template("detector/404.html"), 404
 
 
 
