@@ -375,7 +375,7 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python,flask,pycharm
 
 model.pt
-local.db
-local.sqlite
+*.db
+*.sqlite
 .DS_Store
 
