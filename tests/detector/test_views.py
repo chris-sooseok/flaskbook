@@ -54,3 +54,63 @@ def test_upload_signup_post_validate(client):
     rv = upload_image(client,
                       "detector/testdata/test_invalid_file.txt")
     assert 'Not A Supported Image Type' in rv.data.decode()
+
+from apps.detector.models import UserImage
+def test_upload_signup_post(client):
+    signup(client, "test", "flaskbook@example.com", "<PASSWORD>")
+    rv = upload_image(client, "detector/testdata/test_valid_image.jpg")
+    user_image = UserImage.query.first()
+    assert user_image.image_path in rv.data.decode()
+
+
+def test_detect_no_user_image(client):
+    signup(client, "test", "flaskbook@example.com", "<PASSWORD>")
+    upload_image(client, "detector/testdata/test_valid_image.jpg")
+    #
+    rv = client.post("/detect/notxitstid", follow_redirects=True)
+    assert "물체 감지 대상의 이미지가 존재하지 않습니다" in rv.data.decode()
+
+def test_detect(client):
+    signup(client, "test", "flaskbook@example.com", "<PASSWORD>")
+    upload_image(client, "detector/testdata/test_valid_image.jpg")
+    user_image = UserImage.query.first()
+
+    rv = client.post(f"/detect/{user_image.id}", follow_redirects=True)
+    user_image = UserImage.query.first()
+    assert user_image.image_path in rv.data.decode()
+    assert "dog" in rv.data.decode()
+
+def test_detect_search(client):
+    signup(client, "test", "flaskbook@example.com", "<PASSWORD>")
+    upload_image(client, "detector/testdata/test_valid_image.jpg")
+    user_image = UserImage.query.first()
+
+    # 물체를 감지한다
+    client.post(f"/detect/{user_image.id}", follow_redirects=True)
+
+    rv = client.get("/images/search?search=dog")
+    assert user_image.image_path in rv.data.decode()
+    assert "dog" in rv.data.decode()
+
+    # test 단어 검색
+    rv = client.get("/images/search?search=test")
+    assert user_image.image_path not in rv.data.decode()
+    assert "dog" not in rv.data.decode()
+
+
+def test_delete(client):
+    signup(client, "test", "flaskbook@example.com", "<PASSWORD>")
+    upload_image(client, "detector/testdata/test_valid_image.jpg")
+
+    user_image = UserImage.query.first()
+    image_path = user_image.image_path
+    rv = client.post(f"/images/delete/{user_image.id}", follow_redirects=True)
+    assert image_path not in rv.data.decode()
+
+def test_custom_error(client):
+    rv = client.get("/notfound")
+    assert "404 Not Found" in rv.data.decode()
+
+
+
+
